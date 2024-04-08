@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apartment Price Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}"> <!-- Link to CSS file -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-box">
+            <div class="chat-header">
+                <h1>Apartment Price Prediction</h1>
+            </div>
+            <div class="chat-body" id="chatBody">
+                <div class="message">
+                    <p>Welcome! Please enter the details.</p>
+                </div>
+            </div>
+            <div class="chat-footer">
+                <form id="predictionForm">
+                    <input type="number" id="bedrooms" name="bedrooms" placeholder="Bedrooms" required>
+                    <input type="number" id="bathrooms" name="bathrooms" placeholder="Bathrooms" required>
+                    <input type="number" id="toilets" name="toilets" placeholder="Toilets" required>
+                    <input type="number" id="total_rooms" name="total_rooms" placeholder="Total Rooms" required>
+                    <button type="submit">Predict</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="overlay" id="loadingOverlay">
+        <div class="loader"></div>
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            $('#predictionForm').submit(function(e){
+                e.preventDefault();
+                $('#loadingOverlay').fadeIn(); // Show loading overlay
+                var formData = $(this).serialize();
+                $.ajax({
+                    type: 'POST',
+                    url: '/predict',
+                    data: formData,
+                    success: function(response){
+                        $('#loadingOverlay').fadeOut(); // Hide loading overlay
+                        $('#chatBody').append('<div class="message">Predicted apartment price: ₦' + response.prediction + '</div>');
+                    },
+                    error: function(xhr, status, error){
+                        $('#loadingOverlay').fadeOut(); // Hide loading overlay
+                        $('#chatBody').append('<div class="message error">Error: ' + xhr.responseJSON.error + '</div>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
